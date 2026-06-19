@@ -1,0 +1,34 @@
+# ENV (CRITICAL)
+.env
+.env.*
+*.env
+
+# Node
+node_modules/
+
+# Logs
+logs
+*.log
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Frontend specific
+frontend/node_modules/
+frontend/build/
+
+# Backend specific
+backend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Cache
+.cache/

@@ -1,0 +1,25 @@
+-- USERS TABLE
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- DOCUMENTS TABLE (for later)
+CREATE TABLE IF NOT EXISTS documents (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  filename TEXT,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- QUIZ TABLE (optional for later)
+CREATE TABLE IF NOT EXISTS quizzes (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  document_id INTEGER,
+  quiz_json JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

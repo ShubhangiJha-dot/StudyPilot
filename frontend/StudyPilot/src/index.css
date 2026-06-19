@@ -1,0 +1,48 @@
+@import "tailwindcss";
+body{
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
+:root {
+  /* Base */
+  --background: oklch(21.8% 0.008 223.9);
+  --foreground: #ffffff;
+
+  /* Surface */
+  --card: oklch(34.305% 0.01086 225.534);
+
+  /* Brand */
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --gradient-primary-start: #10b981;
+  --gradient-primary-end: #058159;
+  /* UI */
+  --muted: #6b7280;
+  --border: #454343;
+}
+
+.gradient-primary {
+  @apply bg-gradient-to-r;
+  background-image: linear-gradient(
+    to right,
+    var(--gradient-primary-start),
+    var(--gradient-primary-end)
+  );
+}
+
+.gradient-primary-hover:hover {
+  background-image: linear-gradient(
+    to right,
+    var(--gradient-primary-start),
+    var(--gradient-primary-end)
+  );
+}
+
+.gradient-primary-vertical {
+  background-image: linear-gradient(
+    to bottom,
+    var(--gradient-primary-start),
+    var(--gradient-primary-end)
+  );
+}
