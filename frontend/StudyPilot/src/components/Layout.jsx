@@ -4,17 +4,26 @@ import { Outlet } from "react-router-dom";
 
 function Layout() {
   return (
-    <div>
-      {/* Top navbar */}
-      <Navbar />
+    <div className="min-h-screen flex flex-col">
 
-      {/* Sidebar + Page */}
-      <div style={{ display: "flex" }}>
-        <Sidebar />
+      {/* NAVBAR */}
+      <div className="sticky top-0 z-50 bg-[var(--background)]">
+        <Navbar />
+      </div>
 
-        <div style={{ padding: "20px", width: "100%" }}>
+      {/* BODY */}
+      <div className="flex flex-1">
+
+        {/* SIDEBAR */}
+        <div className="sticky top-16 h-[calc(100vh-4rem)] ">
+          <Sidebar />
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="flex-1 p-6">
           <Outlet />
         </div>
+
       </div>
     </div>
   );

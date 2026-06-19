@@ -28,55 +28,70 @@ const generateResponse = async (prompt) => {
 
 // 1. Summary
 export const generateSummary = async (text) => {
-  const prompt = `
-Summarize the following text into clear bullet points:
+const prompt = `
+Summarize the following text into ONLY 5-6 short bullet points.
 
+Rules:
+- Give only pointers not "Here is the summary..."
+- Focus only on key ideas
+- Give one pointer for each subheading/topic if possible describing the crux idea of that section
+- Keep it brief but use academic tone preferably to help in exams
+- Each subheading/topic should've been mentioned
+- Use less than 20 words for each pointer
+
+Text:
 ${text}
-  `;
+`;
   return await generateResponse(prompt);
 };
 
 
 // 2. Concept Explainer
 export const explainConcept = async (topic) => {
-  const prompt = `
-Explain the following topic in simple terms like a teacher:
+const prompt = `
+Explain the following topic in very simple terms.
 
+Rules:
+- Directly start with the explanation, not headers or subheadings
+- Keep it under 200 words
+- Use simple language, but add academic tone so student knows how to frame it in an essay
+- No long paragraphs
+- Make it easy for a student to understand
+
+Topic:
 ${topic}
-  `;
+`;
   return await generateResponse(prompt);
 };
 
 // 3. Quiz Generator (with JSON safety)
-export const generateQuiz = async (text) => {
-  const prompt = `
-Generate 5 multiple choice questions from the text below.
+export const generateQuiz = async (text, numQuestions) => {
+  const trimmed = text.slice(0, 4000);
 
-Return ONLY valid JSON in this format:
+  const prompt = `
+Generate ${numQuestions} multiple choice questions from the text.
+
+Rules:
+- 4 options each
+- Only one correct answer
+- Include explanation (1 line)
+- Keep questions simple
+
+Return STRICT JSON like this:
 [
   {
-    "question": "",
-    "options": ["", "", "", ""],
-    "answer": ""
+    "question": "...",
+    "options": ["A", "B", "C", "D"],
+    "correctAnswer": "A",
+    "explanation": "..."
   }
 ]
 
 Text:
-${text}
-  `;
+${trimmed}
+`;
 
-  const raw = await generateResponse(prompt);
-
-  // ✅ Clean + parse JSON safely
-  try {
-    const cleaned = raw
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
-    return JSON.parse(cleaned);
-  } catch (err) {
-    console.error("Quiz JSON Parse Error:", raw);
-    throw new Error("Failed to parse quiz JSON");
-  }
+  const response = await generateResponse(prompt);
+const clean = response.replace(/```json|```/g, "").trim();
+return JSON.parse(clean);
 };

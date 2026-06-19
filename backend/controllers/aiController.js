@@ -35,13 +35,14 @@ export const getExplanation = async (req, res) => {
 // Quiz
 export const getQuiz = async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, numQuestions } = req.body;
 
-    const quiz = await generateQuiz(text);
+    const quiz = await generateQuiz(text, numQuestions);
 
     res.json({ quiz });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error generating quiz" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Quiz generation failed" });
   }
 };
