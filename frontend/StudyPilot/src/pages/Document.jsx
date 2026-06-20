@@ -73,17 +73,6 @@ useEffect(() => {
         </button>
       </div>
 
-      {/* <div className="mt-6 flex flex-col gap-2">
-        {docs.map((doc) => (
-          <div
-            key={doc.id}
-            className="p-3 border border-[var(--border)] rounded-lg"
-          >
-            {doc.filename}
-          </div>
-        ))}
-      </div> */}
-
 <div className="grid grid-cols-3 gap-4 mt-6">
   {docs.map((doc) => (
     <div
