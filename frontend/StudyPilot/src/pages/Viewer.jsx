@@ -93,6 +93,43 @@ const [loadingQuiz, setLoadingQuiz] = useState(false);
   }
 };
 
+const handleGenerateQuiz = async () => {
+  try {
+    if (!doc?.content) {
+      alert("Document text not found");
+      return;
+    }
+
+    setLoadingQuiz(true);
+
+    const res = await fetch("http://localhost:5000/api/ai/quiz", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        text: doc.content,
+        numQuestions,
+      }),
+    });
+
+    const data = await res.json();
+
+    setQuiz(data.quiz);
+    setQuizAnswers({});
+    setQuizStep("quiz");
+if (!data.quiz) {
+  alert("Quiz generation failed");
+  return;
+}
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingQuiz(false);
+  }
+};
+
   if (!doc) return <div className="p-6">Loading...</div>;
 
   return (
@@ -179,28 +216,137 @@ const [loadingQuiz, setLoadingQuiz] = useState(false);
   </div>
 )}
 
-
 {activeTab === "quiz" && (
   <div className="p-4">
-    <h2 className="text-lg font-semibold mb-4">
-      Generated Quiz
-    </h2>
 
-    <div className="space-y-4">
-      <div className="p-4 border border-gray-700 rounded-lg">
-        <p className="font-medium">
-          What is Value Education?
-        </p>
-        <ul className="mt-2 text-sm text-gray-300">
-          <li>A. Random concept</li>
-          <li>B. Process of human value development</li>
-          <li>C. Programming method</li>
-          <li>D. None</li>
-        </ul>
+    {/* STEP 1: START */}
+    {quizStep === "start" && (
+      <div className="border-2 border-gray-700 p-6 rounded-lg">
+
+        <h2 className="text-lg font-semibold mb-4">Generate Quiz</h2>
+
+        <select
+          value={numQuestions}
+          onChange={(e) => setNumQuestions(e.target.value)}
+          className="p-2 bg-gray-800 rounded mb-4"
+        >
+          <option value={5}>5 Questions</option>
+          <option value={10}>10 Questions</option>
+        </select>
+
+        <br />
+
+        <button
+          onClick={handleGenerateQuiz}
+          className="px-4 py-2 gradient-primary rounded"
+        >
+          Generate Quiz
+        </button>
+
+        {loadingQuiz && <p className="mt-4">Generating...</p>}
       </div>
-    </div>
+    )}
+
+    {/* STEP 2: QUIZ */}
+    {quizStep === "quiz" && (
+      <div className="space-y-6">
+
+        {quiz?.map((q, i) => (
+          <div key={i} className="p-4 border border-gray-700 rounded-lg">
+
+            <p className="font-medium mb-2">
+              {i + 1}. {q.question}
+            </p>
+
+            <div className="space-y-2">
+              {q.options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() =>
+                    setQuizAnswers({ ...quizAnswers, [i]: opt })
+                  }
+                  className={`block w-full text-left p-2 rounded border
+                    ${quizAnswers[i] === opt
+                      ? "border-[var(--primary)] bg-gray-800"
+                      : "border-gray-700"
+                    }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+
+          </div>
+        ))}
+
+        <button
+          onClick={() => setQuizStep("result")}
+          className="px-6 py-2 gradient-primary rounded"
+        >
+          Submit Quiz
+        </button>
+      </div>
+    )}
+
+    {/* STEP 3: RESULT */}
+    {quizStep === "result" && (
+      <div>
+
+        <h2 className="text-lg font-semibold mb-4">
+          Results
+        </h2>
+
+        <p className="mb-6">
+          Score: {
+            quiz.filter((q, i) => quizAnswers[i] === q.correctAnswer).length
+          } / {quiz.length}
+        </p>
+
+        {quiz.map((q, i) => (
+          <div key={i} className="p-4 border border-gray-700 rounded-lg mb-4">
+
+            <p className="font-medium mb-2">
+              {q.question}
+            </p>
+
+            {q.options.map((opt, idx) => {
+              const isCorrect = opt === q.correctAnswer;
+              const isSelected = quizAnswers[i] === opt;
+
+              return (
+                <div
+                  key={idx}
+                  className={`p-2 rounded mb-1
+                    ${isCorrect ? "bg-green-900" : ""}
+                    ${isSelected && !isCorrect ? "bg-red-900" : ""}
+                  `}
+                >
+                  {opt}
+                </div>
+              );
+            })}
+
+            <p className="text-sm mt-2 text-gray-400">
+              {q.explanation}
+            </p>
+
+          </div>
+        ))}
+
+        <button
+          onClick={() => setQuizStep("start")}
+          className="px-4 py-2 gradient-primary rounded"
+        >
+          Retry
+        </button>
+
+      </div>
+    )}
+
   </div>
 )}
+
+
     </div>
   );
 }
