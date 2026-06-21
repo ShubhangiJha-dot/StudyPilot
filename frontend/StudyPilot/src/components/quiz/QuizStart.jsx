@@ -1,30 +1,28 @@
 import { useState } from "react";
+import API from "../../api/axios"; 
 
 function QuizStart({ doc, setQuiz, setStep }) {
   const [num, setNum] = useState(5);
   const [loading, setLoading] = useState(false);
 
-  const handleGenerate = async () => {
-    setLoading(true);
 
-    const res = await fetch("http://localhost:5000/api/ai/quiz", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({
-        text: doc.content,
-        numQuestions: Number(num),
-      }),
+const handleGenerate = async () => {
+  setLoading(true);
+
+  try {
+    const { data } = await API.post("/api/ai/quiz", {
+      text: doc.content,
+      numQuestions: Number(num),
     });
-
-    const data = await res.json();
 
     setQuiz(data.quiz);
     setStep("quiz");
-    setLoading(false);
-  };
+  } catch (err) {
+    console.error(err);
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="border-2 border-gray-700 p-6 rounded-lg">
