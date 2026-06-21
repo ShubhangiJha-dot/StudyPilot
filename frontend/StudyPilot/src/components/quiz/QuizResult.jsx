@@ -74,7 +74,7 @@ const correctCount = quiz.filter((q, i) => {
                 key={idx}
                 className={`p-2 rounded mb-1
                   ${isCorrect ? "bg-emerald-600" : ""}
-                  ${isSelected && !isCorrect ? "bg-red-500" : ""}
+                  ${isSelected && !isCorrect ? "bg-red-600" : ""}
                 `}
               >
                 {opt}
