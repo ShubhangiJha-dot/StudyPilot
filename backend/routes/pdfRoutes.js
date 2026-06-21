@@ -1,6 +1,6 @@
 import express from "express";
 import pool from "../config/db.js";
-import { uploadPDF } from "../controllers/pdfController.js";
+import { uploadPDF, getPDF, getUserDocuments } from "../controllers/pdfController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 
@@ -21,5 +21,5 @@ router.get("/", protect, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
+router.get("/:id", protect, getPDF);
 export default router;

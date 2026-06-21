@@ -4,14 +4,73 @@ import {
   generateQuiz,
 } from "../services/aiService.js";
 
-// Summary
+// // Summary
+// export const getSummary = async (req, res) => {
+//   try {
+//     const { text } = req.body;
+
+//     const summary = await generateSummary(text);
+
+//     res.json({ summary });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error generating summary" });
+//   }
+// };
+
+import pool from "../config/db.js";
+
+// export const getSummary = async (req, res) => {
+//   try {
+//     const { documentId } = req.body;
+
+//     const result = await pool.query(
+//       "SELECT content FROM documents WHERE id = $1 AND user_id = $2",
+//       [documentId, req.user.id]
+//     );
+
+//     const text = result.rows[0]?.content;
+
+//     if (!text) {
+//       return res.status(400).json({ message: "Document text missing" });
+//     }
+
+//     const summary = await generateSummary(text);
+
+//     res.json({ summary });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error generating summary" });
+//   }
+// };
 export const getSummary = async (req, res) => {
   try {
-    const { text } = req.body;
+    const { documentId } = req.body;
+
+    console.log("DOCUMENT ID:", documentId);
+    console.log("USER ID:", req.user.id);
+
+    const result = await pool.query(
+      "SELECT content FROM documents WHERE id = $1 AND user_id = $2",
+      [documentId, req.user.id]
+    );
+
+    console.log("DB RESULT:", result.rows);
+
+    const text = result.rows[0]?.content;
+
+    if (!text) {
+      console.log("❌ TEXT NOT FOUND");
+      return res.status(400).json({ message: "Document text missing" });
+    }
+
+    console.log("✅ TEXT FOUND LENGTH:", text.length);
 
     const summary = await generateSummary(text);
 
     res.json({ summary });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error generating summary" });

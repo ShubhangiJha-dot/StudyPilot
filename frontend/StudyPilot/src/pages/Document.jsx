@@ -374,7 +374,7 @@ function Document() {
                       {file.name}
                     </p>
                     <p className="text-xs text-gray-400">
-                      PDF up to 10MB
+                      PDF up to 5MB
                     </p>
                   </>
                 ) : (
@@ -383,7 +383,7 @@ function Document() {
                       Click to upload PDF
                     </p>
                     <p className="text-xs text-gray-400">
-                      PDF up to 10MB
+                      PDF up to 5MB
                     </p>
                   </>
                 )}

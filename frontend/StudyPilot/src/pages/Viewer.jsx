@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import InnerNav from "../components/InnerNav";
 import { Sparkles, Lightbulb } from 'lucide-react';
 import API from "../api/axios";
+import QuizPage from "../pages/QuizPage";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -30,9 +31,16 @@ function Viewer() {
 useEffect(() => {
   const fetchDoc = async () => {
     try {
-      const res = await API.get("/api/pdf");
-      const found = res.data.find(d => d.id == id);
-      setDoc(found);
+      // // const res = await API.get("/api/pdf");
+      // // const found = res.data.find(d => d.id == id);
+      // // setDoc(found);
+      // const res = await API.get(`/api/pdf/${id}`);
+      // setDoc(res.data);
+const res = await API.get(`/api/pdf/${id}`);
+console.log("API RESPONSE:", res.data);
+
+// 🔥 TRY THIS FIRST
+setDoc(res.data.document || res.data);
     } catch (err) {
       console.error(err);
     }
@@ -42,23 +50,45 @@ useEffect(() => {
 }, [id]);
 
   // ✅ SUMMARY (FIXED)
-  const handleGenerateAI = async () => {
-    try {
-      if (!doc?.content) return alert("Document text missing");
+  // const handleGenerateAI = async () => {
+  //   try {
+  //     if (!doc?.content) return alert("Document text missing");
 
-      setLoadingAI(true);
+  //     setLoadingAI(true);
 
-      const res = await API.post("/api/ai/summary", {
-        text: doc.content,
-      });
+  //     const res = await API.post("/api/ai/summary", {
+  //       text: doc.content,
+  //     });
 
-      setSummary(res.data.summary || "");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingAI(false);
+  //     setSummary(res.data.summary || "");
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setLoadingAI(false);
+  //   }
+  // };
+
+
+const handleGenerateAI = async () => {
+  try {
+    if (!doc?.id) {
+      alert("Document not loaded yet");
+      return;
     }
-  };
+
+    setLoadingAI(true);
+
+    const res = await API.post("/api/ai/summary", {
+      documentId: doc.id,
+    });
+
+    setSummary(res.data.summary || "");
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingAI(false);
+  }
+};
 
   // ✅ EXPLAIN (FIXED)
   const handleExplain = async () => {
@@ -119,9 +149,10 @@ useEffect(() => {
   setActiveTab={setActiveTab} 
 />
 
-{activeTab === "content" && doc?.filename &&(
-  <iframe
-    src={`${BASE_URL}/uploads/${doc.filename}`}
+{activeTab === "content" && doc?.url &&(
+  // <iframe
+  //   src={`${BASE_URL}/uploads/${doc.filename}`
+  <iframe src={doc.url}
     className="w-full h-[80vh] border rounded"
   />
 )}
@@ -194,135 +225,8 @@ useEffect(() => {
 </div>
   </div>
 )}
-
-{activeTab === "quiz" && (
-  <div className="p-4">
-
-    {/* STEP 1: START */}
-    {quizStep === "start" && (
-      <div className="border-2 border-gray-700 p-6 rounded-lg">
-
-        <h2 className="text-lg font-semibold mb-4">Generate Quiz</h2>
-
-        <select
-          value={numQuestions}
-          onChange={(e) => setNumQuestions(e.target.value)}
-          className="p-2 bg-gray-800 rounded mb-4"
-        >
-          <option value={5}>5 Questions</option>
-          <option value={10}>10 Questions</option>
-        </select>
-
-        <br />
-
-        <button
-          onClick={handleGenerateQuiz}
-          className="px-4 py-2 gradient-primary rounded"
-        >
-          Generate Quiz
-        </button>
-
-        {loadingQuiz && <p className="mt-4">Generating...</p>}
-      </div>
-    )}
-
-    {/* STEP 2: QUIZ */}
-    {quizStep === "quiz" && (
-      <div className="space-y-6">
-
-        {quiz?.map((q, i) => (
-          <div key={i} className="p-4 border border-gray-700 rounded-lg">
-
-            <p className="font-medium mb-2">
-              {i + 1}. {q.question}
-            </p>
-
-            <div className="space-y-2">
-              {q.options.map((opt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() =>
-                    setQuizAnswers({ ...quizAnswers, [i]: opt })
-                  }
-                  className={`block w-full text-left p-2 rounded border
-                    ${quizAnswers[i] === opt
-                      ? "border-[var(--primary)] bg-gray-800"
-                      : "border-gray-700"
-                    }`}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-
-          </div>
-        ))}
-
-        <button
-          onClick={() => setQuizStep("result")}
-          className="px-6 py-2 gradient-primary rounded"
-        >
-          Submit Quiz
-        </button>
-      </div>
-    )}
-
-    {/* STEP 3: RESULT */}
-    {quizStep === "result" && (
-      <div>
-
-        <h2 className="text-lg font-semibold mb-4">
-          Results
-        </h2>
-
-        <p className="mb-6">
-          Score: {
-            quiz.filter((q, i) => quizAnswers[i] === q.correctAnswer).length
-          } / {quiz.length}
-        </p>
-
-        {quiz.map((q, i) => (
-          <div key={i} className="p-4 border border-gray-700 rounded-lg mb-4">
-
-            <p className="font-medium mb-2">
-              {q.question}
-            </p>
-
-            {q.options.map((opt, idx) => {
-              const isCorrect = opt === q.correctAnswer;
-              const isSelected = quizAnswers[i] === opt;
-
-              return (
-                <div
-                  key={idx}
-                  className={`p-2 rounded mb-1
-                    ${isCorrect ? "bg-green-900" : ""}
-                    ${isSelected && !isCorrect ? "bg-red-900" : ""}
-                  `}
-                >
-                  {opt}
-                </div>
-              );
-            })}
-
-            <p className="text-sm mt-2 text-gray-400">
-              {q.explanation}
-            </p>
-
-          </div>
-        ))}
-
-        <button
-          onClick={() => setQuizStep("start")}
-          className="px-4 py-2 gradient-primary rounded"
-        >
-          Retry
-        </button>
-
-      </div>
-    )}
-
-  </div>
+ {activeTab === "quiz" && (
+  <QuizPage doc={doc} />
 )}
 
 
