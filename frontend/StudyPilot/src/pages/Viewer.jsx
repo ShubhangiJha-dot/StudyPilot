@@ -31,13 +31,7 @@ function Viewer() {
 useEffect(() => {
   const fetchDoc = async () => {
     try {
-      // // const res = await API.get("/api/pdf");
-      // // const found = res.data.find(d => d.id == id);
-      // // setDoc(found);
-      // const res = await API.get(`/api/pdf/${id}`);
-      // setDoc(res.data);
 const res = await API.get(`/api/pdf/${id}`);
-console.log("API RESPONSE:", res.data);
 
 // 🔥 TRY THIS FIRST
 setDoc(res.data.document || res.data);
@@ -49,26 +43,7 @@ setDoc(res.data.document || res.data);
   fetchDoc();
 }, [id]);
 
-  // ✅ SUMMARY (FIXED)
-  // const handleGenerateAI = async () => {
-  //   try {
-  //     if (!doc?.content) return alert("Document text missing");
-
-  //     setLoadingAI(true);
-
-  //     const res = await API.post("/api/ai/summary", {
-  //       text: doc.content,
-  //     });
-
-  //     setSummary(res.data.summary || "");
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     setLoadingAI(false);
-  //   }
-  // };
-
-
+  
 const handleGenerateAI = async () => {
   try {
     if (!doc?.id) {
@@ -150,8 +125,6 @@ const handleGenerateAI = async () => {
 />
 
 {activeTab === "content" && doc?.url &&(
-  // <iframe
-  //   src={`${BASE_URL}/uploads/${doc.filename}`
   <iframe src={doc.url}
     className="w-full h-[80vh] border rounded"
   />

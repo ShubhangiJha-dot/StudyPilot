@@ -4,46 +4,9 @@ import {
   generateQuiz,
 } from "../services/aiService.js";
 
-// // Summary
-// export const getSummary = async (req, res) => {
-//   try {
-//     const { text } = req.body;
-
-//     const summary = await generateSummary(text);
-
-//     res.json({ summary });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error generating summary" });
-//   }
-// };
 
 import pool from "../config/db.js";
 
-// export const getSummary = async (req, res) => {
-//   try {
-//     const { documentId } = req.body;
-
-//     const result = await pool.query(
-//       "SELECT content FROM documents WHERE id = $1 AND user_id = $2",
-//       [documentId, req.user.id]
-//     );
-
-//     const text = result.rows[0]?.content;
-
-//     if (!text) {
-//       return res.status(400).json({ message: "Document text missing" });
-//     }
-
-//     const summary = await generateSummary(text);
-
-//     res.json({ summary });
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error generating summary" });
-//   }
-// };
 export const getSummary = async (req, res) => {
   try {
     const { documentId } = req.body;
